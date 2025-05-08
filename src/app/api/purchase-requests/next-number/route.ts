@@ -1,9 +1,14 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { authOptions } from 'src/lib/auth'
 import { PrismaClient, Prisma } from '@prisma/client'
 
+export const dynamic = 'force-dynamic'  // <-- Adicione esta linha aqui
+
 const prisma = new PrismaClient()
+
+// restante do código...
+
 
 // GET - Obter o próximo número de requisição
 export async function GET() {

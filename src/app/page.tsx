@@ -1,25 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { signIn, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ShoppingCart } from 'lucide-react'
 
-export default function LoginPage() {
+function LoginContent() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const searchParams = useSearchParams()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   
-  // Se o usuário já estiver autenticado, redireciona para o dashboard
   useEffect(() => {
     if (status === 'authenticated') {
       router.push('/dashboard')
     }
   }, [status, router])
   
-  // Verifica se há um erro na URL
   useEffect(() => {
     const errorParam = searchParams.get('error')
     if (errorParam === 'CredentialsSignin') {
@@ -120,4 +118,12 @@ export default function LoginPage() {
       </div>
     </div>
   )
-} 
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <LoginContent />
+    </Suspense>
+  )
+}
