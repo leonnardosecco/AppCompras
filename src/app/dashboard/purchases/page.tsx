@@ -200,7 +200,6 @@ export default function PurchasePage() {
         <div className="bg-white p-4 rounded-lg shadow">
           <h2 className="text-xl font-semibold mb-4">Parcelamento</h2>
           <InstallmentList
-            totalValue={purchase.netTotal}
             installments={purchase.installments}
             onInstallmentsChange={(installments) => setPurchase(prev => ({ ...prev, installments }))}
           />

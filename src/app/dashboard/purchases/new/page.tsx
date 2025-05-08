@@ -214,7 +214,7 @@ export default function NewPurchasePage() {
 
   useEffect(() => {
     updateCurrentServiceTotal()
-  }, [currentService.value, currentService.quantity, currentService.discount])
+  }, [currentService.value, currentService.discount])
 
   const handleAddService = () => {
     if (currentService.description && currentService.value > 0) {
