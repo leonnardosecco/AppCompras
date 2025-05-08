@@ -21,25 +21,20 @@
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/users/page.js"
     ],
-    "/dashboard/orders/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/orders/page.js"
-    ],
     "/dashboard/purchase-requests/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/purchase-requests/page.js"
     ],
+    "/dashboard/orders/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/orders/page.js"
+    ],
     "/dashboard/unified-purchase/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/dashboard/unified-purchase/page.js"
-    ],
-    "/dashboard/purchase-requests/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/purchase-requests/[id]/page.js"
     ]
   }
 }

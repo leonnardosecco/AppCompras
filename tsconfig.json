@@ -32,7 +32,7 @@
     "**/*.ts",
     "**/*.tsx",
     "src/types/**/*.d.ts"
-  ],
+, "test-db.JS"  ],
   "exclude": [
     "node_modules"
   ]
