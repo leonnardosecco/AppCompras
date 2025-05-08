@@ -21,9 +21,7 @@ model Account {
   scope             String?
   id_token          String? @db.Text
   session_state     String?
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@unique([provider, providerAccountId])
 }
 
@@ -150,7 +148,7 @@ model PurchaseInstallment {
   netValue      Float
   receivedValue Float?
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  updatedAt     DateTime  @default(now())
   purchase      Purchase  @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
 }
 
@@ -170,6 +168,7 @@ model ServiceSale {
   client         Client?  @relation(fields: [clientId], references: [id])
   project        Project? @relation(fields: [projectId], references: [id])
   items          ServiceItem[] @relation("ServiceSaleToItems")
+  installments   ServiceInstallment[] @relation("ServiceSaleToInstallments")
 }
 
 model ServiceItem {
@@ -182,9 +181,26 @@ model ServiceItem {
   discount      Float     @default(0)
   total         Float
   createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
+  updatedAt     DateTime  @default(now())
   serviceSale   ServiceSale @relation("ServiceSaleToItems", fields: [serviceSaleId], references: [id], onDelete: Cascade)
+}
+
+model ServiceInstallment {
+  id               String    @id @default(cuid())
+  serviceSaleId    String
+  number           Int
+  account          String
+  paymentMethod    String
+  description      String?
+  nfEmission       DateTime?
+  dueDate          DateTime
+  receipt          DateTime?
+  grossValue       Float
+  netValue         Float
+  receivedValue    Float?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+  serviceSale      ServiceSale @relation("ServiceSaleToInstallments", fields: [serviceSaleId], references: [id], onDelete: Cascade)
 }
 
 model PurchaseRequest {
@@ -207,7 +223,6 @@ model PurchaseRequest {
   comments        String?   @db.Text
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-
   client        Client?   @relation(fields: [clientId], references: [id])
   project       Project?  @relation(fields: [projectId], references: [id])
   items         PurchaseRequestItem[]
@@ -228,8 +243,7 @@ model PurchaseRequestItem {
   isApproved        Boolean?
   approvalNotes     String?
   createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
+  updatedAt         DateTime  @default(now())
   purchaseRequest   PurchaseRequest @relation(fields: [purchaseRequestId], references: [id], onDelete: Cascade)
   purchaseItems     PurchaseItem[]
 }
