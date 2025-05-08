@@ -1,0 +1,275 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:123@localhost:5432/compras?schema=public"
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String
+  image         String?
+  role          String    @default("user")
+  accounts      Account[]
+  sessions      Session[]
+  createdRequests PurchaseRequest[] @relation("RequestCreator")
+  approvedRequests PurchaseRequest[] @relation("RequestApprover")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Client {
+  id                   String    @id @default(cuid())
+  fantasyName         String
+  companyName         String?
+  municipalRegistration String?
+  stateRegistration   String?
+  type                String    @default("PJ")
+  document            String?
+  email               String?
+  phone               String?
+  pix                 String?
+  observations        String?
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  projects            Project[]
+  purchases          Purchase[]
+  serviceSales        ServiceSale[]
+  purchaseRequests    PurchaseRequest[]
+}
+
+model Project {
+  id        String     @id @default(cuid())
+  name      String
+  clientId  String
+  color     String     @default("#0000FF")
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  client    Client     @relation(fields: [clientId], references: [id])
+  purchases Purchase[]
+  serviceSales ServiceSale[]
+  purchaseRequests PurchaseRequest[]
+}
+
+model Purchase {
+  id           String     @id @default(cuid())
+  number       String     @unique
+  date         DateTime   @default(now())
+  cnpj         String?
+  clientId     String?
+  projectId    String?
+  observations String?    @db.Text
+  hasWithholdingTax Boolean @default(false)
+  withholdingTaxValue Float @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  client       Client?    @relation(fields: [clientId], references: [id])
+  project      Project?   @relation(fields: [projectId], references: [id])
+  items        PurchaseItem[]
+  services     PurchaseService[]
+  installments PurchaseInstallment[]
+  purchaseRequest PurchaseRequest? @relation(fields: [purchaseRequestId], references: [id])
+  purchaseRequestId String?
+}
+
+model PurchaseItem {
+  id          String   @id @default(cuid())
+  purchaseId  String
+  description String
+  quantity    Float
+  unit        String
+  unitPrice   Float
+  total       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  purchase    Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  // Relação com PurchaseRequestItem
+  purchaseRequestItemId String?
+  purchaseRequestItem   PurchaseRequestItem? @relation(fields: [purchaseRequestItemId], references: [id])
+}
+
+model PurchaseService {
+  id            String   @id @default(cuid())
+  purchaseId    String
+  description   String
+  value         Float
+  inssRetention Float    @default(0)
+  issRetention  Float    @default(0)
+  irRetention   Float    @default(0)
+  netValue      Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  purchase      Purchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+}
+
+model PurchaseInstallment {
+  id            String    @id @default(cuid())
+  purchaseId    String
+  number        Int
+  account       String
+  paymentMethod String
+  description   String?
+  nfEmission    DateTime?
+  dueDate       DateTime
+  receipt       DateTime?
+  grossValue    Float
+  netValue      Float
+  receivedValue Float?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  purchase      Purchase  @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+}
+
+// Modelo para venda de serviços
+model ServiceSale {
+  id           String    @id @default(cuid())
+  number       String    @unique
+  date         DateTime  @default(now())
+  clientId     String?
+  projectId    String?
+  observations String?   @db.Text
+  taxRetention Boolean   @default(false)
+  taxValue     Float     @default(0)
+  totalValue   Float     @default(0)
+  receivableValue Float  @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  // Relacionamentos
+  client       Client?   @relation(fields: [clientId], references: [id])
+  project      Project?  @relation(fields: [projectId], references: [id])
+  items        ServiceItem[]
+  installments ServiceInstallment[]
+}
+
+// Itens da venda de serviço
+model ServiceItem {
+  id            String    @id @default(cuid())
+  serviceSaleId String
+  serviceType   String
+  description   String?
+  price         Float
+  quantity      Float     @default(1)
+  discount      Float     @default(0)
+  total         Float
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relacionamento
+  serviceSale   ServiceSale @relation(fields: [serviceSaleId], references: [id], onDelete: Cascade)
+}
+
+// Parcelas da venda de serviço
+model ServiceInstallment {
+  id               String    @id @default(cuid())
+  serviceSaleId    String
+  number           Int
+  account          String
+  paymentMethod    String
+  description      String?
+  nfEmission       DateTime?
+  dueDate          DateTime
+  receipt          DateTime?
+  grossValue       Float
+  netValue         Float
+  receivedValue    Float?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  // Relacionamento
+  serviceSale      ServiceSale @relation(fields: [serviceSaleId], references: [id], onDelete: Cascade)
+}
+
+// Modelo para requisições de compra
+model PurchaseRequest {
+  id              String    @id @default(cuid())
+  number          String    @unique
+  title           String
+  description     String?   @db.Text
+  clientId        String?
+  projectId       String?
+  status          String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  priority        String    @default("MEDIUM")  // LOW, MEDIUM, HIGH
+  justification   String?   @db.Text
+  requestDate     DateTime  @default(now())
+  approvalDate    DateTime?
+  neededByDate    DateTime?
+  budgetLimit     Float?
+  createdById     String    // Usuário que criou a requisição
+  approvedById    String?   // Usuário que aprovou/rejeitou
+  rejectionReason String?   @db.Text
+  comments        String?   @db.Text
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relacionamentos
+  client          Client?   @relation(fields: [clientId], references: [id])
+  project         Project?  @relation(fields: [projectId], references: [id])
+  items           PurchaseRequestItem[]
+  createdBy       User      @relation("RequestCreator", fields: [createdById], references: [id])
+  approvedBy      User?     @relation("RequestApprover", fields: [approvedById], references: [id])
+  purchases       Purchase[]
+}
+
+// Itens da requisição de compra
+model PurchaseRequestItem {
+  id                String    @id @default(cuid())
+  purchaseRequestId String
+  description       String
+  quantity          Float
+  unit              String
+  estimatedPrice    Float?
+  justification     String?
+  urgency           String    @default("NORMAL") // LOW, NORMAL, HIGH, CRITICAL
+  isApproved        Boolean?
+  approvalNotes     String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relacionamento
+  purchaseRequest   PurchaseRequest @relation(fields: [purchaseRequestId], references: [id], onDelete: Cascade)
+  purchaseItems     PurchaseItem[]
+} 

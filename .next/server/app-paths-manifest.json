@@ -1,0 +1,17 @@
+{
+  "/page": "app/page.js",
+  "/api/auth/[...nextauth]/route": "app/api/auth/[...nextauth]/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
+  "/dashboard/users/page": "app/dashboard/users/page.js",
+  "/api/users/route": "app/api/users/route.js",
+  "/dashboard/orders/page": "app/dashboard/orders/page.js",
+  "/api/pedidos/route": "app/api/pedidos/route.js",
+  "/dashboard/purchase-requests/page": "app/dashboard/purchase-requests/page.js",
+  "/api/purchase-requests/route": "app/api/purchase-requests/route.js",
+  "/api/clients/route": "app/api/clients/route.js",
+  "/dashboard/unified-purchase/page": "app/dashboard/unified-purchase/page.js",
+  "/api/projects/route": "app/api/projects/route.js",
+  "/api/purchase-requests/next-number/route": "app/api/purchase-requests/next-number/route.js",
+  "/dashboard/purchase-requests/[id]/page": "app/dashboard/purchase-requests/[id]/page.js",
+  "/api/purchase-requests/[id]/route": "app/api/purchase-requests/[id]/route.js"
+}
