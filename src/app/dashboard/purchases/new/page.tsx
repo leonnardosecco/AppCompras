@@ -236,7 +236,10 @@ export default function NewPurchasePage() {
         inssRetention: 0,
         issRetention: 0,
         irRetention: 0,
-        netValue: 0
+        netValue: 0,
+        quantity: 0,
+        discount: 0,
+        total: 0
       });
     }
   };
