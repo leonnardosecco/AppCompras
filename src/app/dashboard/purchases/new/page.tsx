@@ -83,6 +83,9 @@ interface CurrentService {
   issRetention: number;
   irRetention: number;
   netValue: number;
+  quantity: number;
+  discount: number;
+  total?: number;
 }
 
 const validationRules = {
@@ -125,7 +128,10 @@ export default function NewPurchasePage() {
     inssRetention: 0,
     issRetention: 0,
     irRetention: 0,
-    netValue: 0
+    netValue: 0,
+    quantity: 0,
+    discount: 0,
+    total: 0
   })
 
   const [currentInstallment, setCurrentInstallment] = useState<Installment>({
