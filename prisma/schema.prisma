@@ -1,6 +1,4 @@
 
-// Prisma schema completo com todos os modelos
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -171,6 +169,22 @@ model ServiceSale {
   updatedAt      DateTime @updatedAt
   client         Client?  @relation(fields: [clientId], references: [id])
   project        Project? @relation(fields: [projectId], references: [id])
+  items          ServiceItem[] @relation("ServiceSaleToItems")
+}
+
+model ServiceItem {
+  id            String    @id @default(cuid())
+  serviceSaleId String
+  serviceType   String
+  description   String?
+  price         Float
+  quantity      Float     @default(1)
+  discount      Float     @default(0)
+  total         Float
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  serviceSale   ServiceSale @relation("ServiceSaleToItems", fields: [serviceSaleId], references: [id], onDelete: Cascade)
 }
 
 model PurchaseRequest {
